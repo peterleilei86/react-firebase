@@ -1,26 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import {useAuth} from './contexts/auth-context'
+import Loader from './Loader'
+
+const loadAuthApp = () => import('./Authenticated-app')
+const AuthenticatedApp = React.lazy(loadAuthApp)
+const UnauthenticatedApp = React.lazy(() => import('./Unauthenticated-app'))
 
 function App() {
+  const {user} = useAuth()
+
+  React.useEffect(() => {
+    loadAuthApp()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <React.Suspense fallback={<Loader />}>
+      {!!user ? <AuthenticatedApp /> : <UnauthenticatedApp />}
+    </React.Suspense>
+  )
 }
 
-export default App;
+export default App
